@@ -20,7 +20,7 @@ class BingoBoard():
 				if self.marked[i,j]:
 					ret.append(" *%2i* " % self.board[i,j])
 				else:
-					ret.append("%4i" % self.board[i,j])
+					ret.append("  %2i  " % self.board[i,j])
 
 			ret.append("\n")
 		return "".join(ret)
@@ -78,9 +78,6 @@ if __name__ == "__main__":
 		num_boards = len(boards)//board_size
 
 		bingo_boards = []
-		winning_board = None
-		winning_score = 0
-		finished = False
 
 		# Extract inital state of all boards and initialize BingoBoards for each
 		for idx in range(num_boards):
@@ -90,23 +87,59 @@ if __name__ == "__main__":
 			# Create BingoBoard object with initial state
 			bboard = BingoBoard(board_size, initial_state)
 			bingo_boards.append(bboard)
-		for num in numbers:
-			for bingo_board in bingo_boards:
-				bingo_board.checkNumber(num)
-				won, idx = bingo_board.checkWin()
-				if won:
-					score = bingo_board.computeScore(num)
-					if score > winning_score:
-						winning_score = score 
-						winning_board = bingo_board
-					bingo_boards.remove(bingo_board)
-					finished = True
+
+
+		### PART 1 ###
+
+		# winning_board = None
+		# winning_score = 0
+		# finished = False
+
+		# for num in numbers:
+		# 	for bingo_board in bingo_boards:
+		# 		bingo_board.checkNumber(num)
+		# 		won, idx = bingo_board.checkWin()
+		# 		if won:
+		# 			score = bingo_board.computeScore(num)
+		# 			if score > winning_score:
+		# 				winning_score = score 
+		# 				winning_board = bingo_board
+		# 			bingo_boards.remove(bingo_board)
+		# 			finished = True
 			
-			if finished:
-				break
+		# 	if finished:
+		# 		break
 
 
-		print(winning_score)
-		print(winning_board)
+		#print(winning_score)
+		#print(winning_board)
+
+
+		### PART 2 ###
+		finished = False
+		winning_boards = []
+
+		for num_idx,num in enumerate(numbers):
+			print("PLAY: %i   NUMBER: %i" % (num_idx, num))
+			for idx in range(len(bingo_boards)):
+				bingo_board  = bingo_boards[idx]
+				if bingo_board:
+					bingo_board.checkNumber(num)
+					won, _ = bingo_board.checkWin()
+					if won:
+						winning_boards.append([bingo_board, bingo_board.computeScore(num), num])
+						length = sum([True for a in bingo_boards if a])
+						if length <= 2:
+							print(bingo_boards[13])
+							print(bingo_boards[13].computeScore(num))
+						bingo_boards[idx] = False
+						
+
+		# for a,b,c in winning_boards:
+		# 	print("NUM: %i" % c)
+		# 	print("SCORE: %i" % b)
+		# 	print(a)
+
+
 	else:
 		raise(AssertionError("$s not found in $s" % (FILENAME, pwd)))
