@@ -32,9 +32,30 @@ if __name__ == "__main__":
 			elif cmd == "forward":
 				x+= int(step)
 
+		#print(x,y)
+		#print(x*y)
+
+
+		### PART 2 ###
+
+		# The commands have changed, a new variable is needed to track aim
+		x = 0
+		y = 0
+		aim = 0
+
+		for elem in data:
+			cmd, step = elem.rstrip().split(' ')
+			
+			if cmd == "up":
+				aim -= int(step)
+			elif cmd == "down":
+				aim += int(step)
+			elif cmd == "forward":
+				x += int(step)
+				y += aim*int(step)
+
 		print(x,y)
 		print(x*y)
-		
 		
 
 	else:
