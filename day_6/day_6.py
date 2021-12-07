@@ -1,5 +1,22 @@
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+
+def update(states):
+
+	# New fish to spawn with timer set to 8
+	temp = states[0]
+
+	# Shift all fish down
+	states[0:-1] = states[1:]
+
+	# Fish that just spawned other fish set to 6
+	states[6]+= temp
+
+	# Spawn new fish
+	states[-1]=temp
+
+	return states
 
 if __name__ == "__main__":
 
@@ -9,6 +26,8 @@ if __name__ == "__main__":
 	# Current Directory
 	pwd = os.getcwd()
 
+	states = np.zeros(9)
+
 	# Check if input file exists in base folder
 	if FILENAME in os.listdir(pwd):
 
@@ -17,27 +36,22 @@ if __name__ == "__main__":
 			data = infile.readlines()
 		
 		# Clean data and cast to int
-		state = [int(elem) for elem in data[0].split(',')] 
+		initial_state = [int(elem) for elem in data[0].split(',')] 
 		
+
+		for timer in initial_state:
+			states[timer] +=1
+		### PART 1 ###
+		#NUM_DAYS = 80
 		
-		NUM_DAYS = 80
-		print("INITIAL STATE")
-		print(state)
+		### PART 2 ###
+		NUM_DAYS = 256
 
 		for t in range(NUM_DAYS):
-			# Array to store new fish while current state is being processed - don't want to process new fish untill next turn
-			newFish = []
-			for idx, fishTimer in enumerate(state):
-				fishTimer -=1
-				if fishTimer < 0:
-					state[idx] = 6
-					newFish.append(8)
-				else:
-					state[idx] = fishTimer
-			# Add any new fish
-			state = state + newFish
-		print("\nDAY: %i   NUM FISH: %i" % (t+1, len(state)))
-
+			states = update(states)
+			print(states)
+			print(sum(states))
+		print("\nDAY: %i   NUM FISH: %i" % (t+1, sum(states)))
 
 	else:
 		raise(AssertionError("$s not found in $s" % (FILENAME, pwd)))
