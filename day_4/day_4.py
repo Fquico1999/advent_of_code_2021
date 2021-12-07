@@ -27,9 +27,8 @@ class BingoBoard():
 
 	def checkNumber(self, num):
 		# Check if number is on board and unmarked
-		idx = np.squeeze(np.where(self.board[:,:] == num))
-		if idx.any():
-			x,y = idx
+		x,y = np.squeeze(np.where(self.board[:,:] == num))
+		if x >= 0  and y >= 0:
 			# Mark number on board
 			self.marked[x,y] = 1
 
@@ -52,6 +51,12 @@ class BingoBoard():
 		unmarked = self.board[self.marked == 0]
 		score = num*np.sum(unmarked)
 		return score
+
+	def getBoard(self):
+		return self.board
+
+	def getMarked(self):
+		return self.marked
 
 
 if __name__ == "__main__":
@@ -120,7 +125,6 @@ if __name__ == "__main__":
 		winning_boards = []
 
 		for num_idx,num in enumerate(numbers):
-			print("PLAY: %i   NUMBER: %i" % (num_idx, num))
 			for idx in range(len(bingo_boards)):
 				bingo_board  = bingo_boards[idx]
 				if bingo_board:
@@ -129,16 +133,17 @@ if __name__ == "__main__":
 					if won:
 						winning_boards.append([bingo_board, bingo_board.computeScore(num), num])
 						length = sum([True for a in bingo_boards if a])
-						if length <= 2:
-							print(bingo_boards[13])
-							print(bingo_boards[13].computeScore(num))
 						bingo_boards[idx] = False
+						if length == 1:
+							finished = True
+			if finished:
+				break
 						
 
-		# for a,b,c in winning_boards:
-		# 	print("NUM: %i" % c)
-		# 	print("SCORE: %i" % b)
-		# 	print(a)
+		losing_board, losing_score, _ = winning_boards[-1]
+		print("\nSCORE: %i" % losing_score)
+		print(losing_board)
+
 
 
 	else:
