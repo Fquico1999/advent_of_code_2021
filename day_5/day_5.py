@@ -61,12 +61,17 @@ if __name__ == "__main__":
 		grid = np.zeros([xmax+1, ymax+1])
 
 		### PART 1 ###
+		# for line in lines:
+		# 	# For part one, only draw horizontal / vertical lines
+		# 	if (line[0] == line[2]) or (line[1] ==line[3]):
+		# 		grid = drawLine(line, grid)
+		# numDangerous = np.sum(grid[:,:] >= 2)
+		# print(numDangerous)
+
+		### PART 2 ###
 		for line in lines:
-			# For part one, only draw horizontal / vertical lines
-			if (line[0] == line[2]) or (line[1] ==line[3]):
-				grid = drawLine(line, grid)
+			grid = drawLine(line, grid)
 		numDangerous = np.sum(grid[:,:] >= 2)
 		print(numDangerous)
-
 	else:
 		raise(AssertionError("$s not found in $s" % (FILENAME, pwd)))
