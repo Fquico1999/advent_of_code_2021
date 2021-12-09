@@ -1,10 +1,12 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from functools import reduce
 
 def part1(heightmap):
 
 	localMin = []
+	indices = []
 	paddedHeightmap = np.pad(heightmap,1,'maximum')
 	lenY, lenX = paddedHeightmap.shape
 
@@ -14,66 +16,58 @@ def part1(heightmap):
 			#Check row above
 			if (paddedHeightmap[i+1, j+1] < paddedHeightmap[i,j+1]) and (paddedHeightmap[i+1, j+1] < paddedHeightmap[i+2,j+1]) and(paddedHeightmap[i+1, j+1] < paddedHeightmap[i+1,j]) and (paddedHeightmap[i+1, j+1] < paddedHeightmap[i+1,j+2]):
 				localMin.append(paddedHeightmap[i+1,j+1])
+				indices.append([i+1, j+1])
 				#print(paddedHeightmap[i:i+3, j:j+3])
 	#print(localMin)
-	return(sum(np.add(localMin,1)))
+	return(indices, sum(np.add(localMin,1)))
 
+def fillBasin(i,j,heightmap, area):
+	# toShow = np.copy(heightmap)
+	# toShow[i,j] = -2
+	# print(toShow)
+	reachedEnd = True
+	if heightmap[i-1, j] == 1:
+		#prevent going back
+		heightmap[i,j] = -1
+		area=fillBasin(i-1, j, heightmap, area)
+	if heightmap[i+1, j] == 1:
+		#prevent going back
+		heightmap[i,j] = -1
+		area=fillBasin(i+1, j, heightmap, area)
+	if heightmap[i, j-1] == 1:
+		#prevent going back
+		heightmap[i,j] = -1
+		area=fillBasin(i, j-1, heightmap, area)
+	if heightmap[i, j+1] == 1:
+		#prevent going back
+		heightmap[i,j] = -1
+		area=fillBasin(i, j+1, heightmap, area)
 
-def grad_descent(data, cost, grad):
-	numCrabs = len(data)
-	bestCost = max(data)*numCrabs
-	bestTarget = 0
+	if reachedEnd:
+		heightmap[i,j] = -1
+		return area+1
 
-	# Normalize data
-	data_min = min(data)
-	data_max = max(data)
-	data_norm = (data - data_min)/data_max
+def part2(heightmap):
+	localMin = []
+	paddedHeightmap = np.pad(heightmap,1,'maximum')
+	lenY, lenX = paddedHeightmap.shape
 
-	# First Guess is random between 0 and 1 - vectorized
-	x = np.ones(numCrabs)*np.random.random(1)
-	print("Initial Guess: %f" % x[0])
+	# Get indices of lowest points
+	indices, _ = part1(heightmap)
 
-	# "Learning Rate" and epochs
-	alpha = 0.0001
-	epochs = 1000
+	mask = np.copy(paddedHeightmap)
+	mask[mask < 9] = 1
+	mask[mask == 9] = 0
+	print(mask)
 
-	# For display
-	c_arr = []
-	x_arr = []
+	areas = []
 
-	for e in range(epochs):
-		print("EPOCH: %i" % e)
+	for i,j in indices:
+		areas.append(fillBasin(i,j,mask.copy(), 0))
 
-		# Compute cost
-		c = cost(x,data_norm)
-		c_arr.append(c)
-
-		# Compute grad
-		dx = grad(x, data_norm)
-		
-		# Update
-		x = x - alpha*dx
-		x_arr.append(x[0])
-
-	print("FINAL X: %.2f" % x[0])
-	print("SCALED X: %i"  % round(x[0]*data_max))
-	scaled_x = round(x[0]*data_max)
-	final_cost = cost(np.ones(numCrabs)*scaled_x, data)
-	print("COST: %i" % round(final_cost*numCrabs))
-
-	fig, ax = plt.subplots()
-	fig.set_size_inches(12,12)
-	ax.plot(range(epochs), c_arr, label='Cost')
-	ax.plot(range(epochs), x_arr, label='x')
-	ax.legend(loc='upper left')
-	ax2 = plt.twinx()
-	ax2.plot(range(epochs), np.multiply(data_max,x_arr), label='scaled x')
-	ax2.legend()
-	ax.set_ylim([0,1])
-	ax2.set_ylim([0,data_max])
-	plt.show()
-
-	return final_cost
+	print("\nThree Largest Basin Areas:")
+	print(sorted(areas)[-3:])
+	print(reduce(lambda x,y: x*y, sorted(areas)[-3:]))
 
 
 if __name__ == "__main__":
@@ -96,7 +90,9 @@ if __name__ == "__main__":
 		data = [np.asarray(list(elem.strip()), dtype=int) for elem in data] 
 		data = np.asarray(data)
 
-		print(part1(data))
+		#print(part1(data))
+
+		part2(data)
 
 		### PART 1 ###
 		#bestCost = grad_descent(data, part1_cost, part1_grad)
