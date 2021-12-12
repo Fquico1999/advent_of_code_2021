@@ -6,7 +6,7 @@ def part1(grid):
 
 	sizeX, sizeY = grid.shape
 	ones = np.ones([sizeX, sizeY], dtype=int)
-	NUMSTEPS = 5
+	NUMSTEPS = 100
 	numFlashes = 0
 	print("INITIAL STATE:")
 	print(grid)
@@ -18,8 +18,9 @@ def part1(grid):
 		grid += ones
 
 		# Check for energy level 10 or higher
-		indices = np.where(grid > 9)
-		while indices[0].any():
+		
+		while np.sum(grid > 9):
+			indices = np.where(grid > 9)
 			for x,y in zip(indices[0], indices[1]):
 				# Add to count
 				numFlashes += 1 
@@ -35,9 +36,6 @@ def part1(grid):
 				ymax = min(sizeY+1, y+2)
 				mask[xmin:xmax, ymin:ymax] = grid[xmin:xmax, ymin:ymax] != -1
 				grid[mask] += 1
-				print(x,y)
-				print(grid)
-				print('\n')
 			indices = np.where(grid > 9)
 
 		# Set -1's to zero
@@ -52,7 +50,7 @@ def part1(grid):
 if __name__ == "__main__":
 
 	# Change this to match name of input file with data
-	FILENAME = 'test.txt'
+	FILENAME = 'input.txt'
 
 	# Current Directory
 	pwd = os.getcwd()
