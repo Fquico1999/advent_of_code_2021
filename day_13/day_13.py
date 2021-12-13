@@ -44,6 +44,7 @@ class TransparentPaper():
 	def plot(self):
 		fig, ax = plt.subplots()
 		ax.imshow(self.state)
+		plt.savefig("result.png")
 		plt.show()
 
 	def __str__(self):
